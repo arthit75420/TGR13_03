@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 
 app.get('/listUsers', function (req, res) {
    fs.readFile(__dirname + "/" + "users.json", 'utf8', function (err, data) {
-      //console.log( data );
+      console.log( data );
       res.end(data);
    });
 })
@@ -27,7 +27,7 @@ app.get('/showbyID/:id', function (req, res) {
    fs.readFile(__dirname + "/" + "users.json", 'utf8', function (err, data) {
       var users = JSON.parse(data);
       var user = users["user" + req.params.id]
-      //console.log(user);
+      console.log( data );
       res.end(JSON.stringify(user));
    });
 })
@@ -43,11 +43,11 @@ app.post('/addUser', function (req, res) {
       addUser.profession = req.body.profession;
       addUser.id = id;
       data["user" + id] = addUser;
-      // console.log(data);
       fs.writeFile('users.json', JSON.stringify(data), function (err) {
          if (err) throw err;
          console.log('Replaced!');
       });
+      console.log( data );
       res.end(JSON.stringify(data));
    });
 })
@@ -65,11 +65,11 @@ app.post('/addMultiUser', function (req, res) {
          data["user" + id] = addUsers;
          id++;
       });
-      // console.log(data);
       fs.writeFile('users.json', JSON.stringify(data), function (err) {
          if (err) throw err;
          console.log('Replaced!');
       });
+      console.log( data );
       res.end(JSON.stringify(data));
    });
 })
@@ -86,6 +86,7 @@ app.delete('/deleteUser/:id', function (req, res) {
       } catch (err) {
          console.log("can't delete id:" + req.params.id);
       }
+      console.log( data );
       res.end(JSON.stringify(data));
    });
 })
