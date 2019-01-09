@@ -52,12 +52,6 @@ app.post('/addUser', function (req, res) {
    });
 })
 
-app.post('/json', function (req, res) {
-    console.log(eq.body);
- })
- app.get('/json', function (req, res) {
-    console.log(eq.body);
- })
 app.post('/addMultiUser', function (req, res) {
    fs.readFile(__dirname + "/" + "users.json", 'utf8', function (err, data) {
       data = JSON.parse(data);
