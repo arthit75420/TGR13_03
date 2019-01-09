@@ -62,7 +62,7 @@ app.post('/receiveData', function (req, res) {
       var data = req.body.DevEUI_uplink;
       var reciveTime = data.Time;
       var frames = data.payload_parsed.frames;
-      var myobj = { teamID: String(frames[1].value), temp: String(frames[1].value) };
+      var myobj = { teamID: String(frames[1].value), temp: String(frames[0].value) };
       dbo.collection("temperature").insertOne(myobj, function(err, res) {
         if (err) throw err;
         console.log(myobj);
