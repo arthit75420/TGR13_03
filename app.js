@@ -26,13 +26,17 @@ app.get('/listUsers', function (req, res) {
    });
 })
 
-app.get('/showbyID/:id', function (req, res) {
-   fs.readFile(__dirname + "/" + "users.json", 'utf8', function (err, data) {
-      var users = JSON.parse(data);
-      var user = users["user" + req.params.id]
-      console.log( data );
-      res.end(JSON.stringify(user));
-   });
+app.get('/showData', function (req, res) {
+   MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("hwData");
+      dbo.collection("temperature").find({}).toArray(function(err, result) {
+        if (err) throw err;
+        res.end(JSON.stringify(result));
+        db.close();
+      });
+    });
+   
 })
 
 
