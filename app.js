@@ -3,6 +3,20 @@ var bodyParser = require("body-parser");
 var app = express();
 var fs = require("fs");
 
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("hwData");
+  var myobj = { teamID: 3, temp: 27 };
+  dbo.collection("temperature").insertOne(myobj, function(err, res) {
+    if (err) throw err;
+    console.log("1 document inserted");
+    db.close();
+  });
+});
+
 function getMaxID(data) {
    var max = 0;
    Object.keys(data).forEach(function (key) {
@@ -52,7 +66,7 @@ app.post('/addUser', function (req, res) {
    });
 })
 
-app.post('/json', function (req, res) {
+app.post('/receiveData', function (req, res) {
     console.log(req.body);
  })
 
