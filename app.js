@@ -19,10 +19,21 @@ app.get('/', function (req, res) {
 });
 app.use(bodyParser.json());
 
-app.get('/listUsers', function (req, res) {
-   fs.readFile(__dirname + "/" + "users.json", 'utf8', function (err, data) {
-      console.log( data );
-      res.end(data);
+app.post('/receiveData', function (req, res) {
+   MongoClient.connect(url, function(err, db) {
+     if (err) throw err;
+     var dbo = db.db("hwData");
+     var data = req.body.DevEUI_uplink;
+     var reciveTime = data.Time;
+     var frames = data.payload_parsed.frames;
+     var myobj = { teamID: String(frames[1].value), temp: String(frames[0].value) };
+     dbo.collection("temperature").insertOne(myobj, function(err, res) {
+       if (err) throw err;
+       console.log(myobj);
+       console.log("1 document inserted");
+       res.end("1 document inserted");
+       db.close();
+     });
    });
 })
 
@@ -40,79 +51,50 @@ app.get('/showData', function (req, res) {
 })
 
 
-app.post('/addUser', function (req, res) {
-   fs.readFile(__dirname + "/" + "users.json", 'utf8', function (err, data) {
-      data = JSON.parse(data);
-      var id = getMaxID(data) + 1;
-      var addUser = {};
-      addUser.name = req.body.name;
-      addUser.password = req.body.password;
-      addUser.profession = req.body.profession;
-      addUser.id = id;
-      data["user" + id] = addUser;
-      fs.writeFile('users.json', JSON.stringify(data), function (err) {
-         if (err) throw err;
-         console.log('Replaced!');
-      });
-      console.log( data );
-      res.end(JSON.stringify(data));
-   });
-})
-
-app.post('/receiveData', function (req, res) {
-    MongoClient.connect(url, function(err, db) {
+app.post('/addData', function (req, res) {
+   MongoClient.connect(url, function(err, db) {
       if (err) throw err;
       var dbo = db.db("hwData");
-      var data = req.body.DevEUI_uplink;
-      var reciveTime = data.Time;
-      var frames = data.payload_parsed.frames;
-      var myobj = { teamID: String(frames[1].value), temp: String(frames[0].value) };
+      var myobj = { teamID: req.body.temp, temp: req.body.teamID };
       dbo.collection("temperature").insertOne(myobj, function(err, res) {
         if (err) throw err;
         console.log(myobj);
         console.log("1 document inserted");
+        res.end("1 document inserted");
         db.close();
       });
     });
- })
-
-app.post('/addMultiUser', function (req, res) {
-   fs.readFile(__dirname + "/" + "users.json", 'utf8', function (err, data) {
-      data = JSON.parse(data);
-      var id = getMaxID(data) + 1;
-      Object.keys(req.body).forEach(function (key) {
-         var addUsers = {};
-         addUsers.name = req.body[key].name;
-         addUsers.password = req.body[key].password;
-         addUsers.profession = req.body[key].profession;
-         addUsers.id = id;
-         data["user" + id] = addUsers;
-         id++;
-      });
-      fs.writeFile('users.json', JSON.stringify(data), function (err) {
-         if (err) throw err;
-         console.log('Replaced!');
-      });
-      console.log( data );
-      res.end(JSON.stringify(data));
-   });
 })
 
-app.delete('/deleteUser/:id', function (req, res) {
-   fs.readFile(__dirname + "/" + "users.json", 'utf8', function (err, data) {
-      data = JSON.parse(data);
-      try {
-         delete data["user" + req.params.id];
-         fs.writeFile('users.json', JSON.stringify(data), function (err) {
-            if (err) throw err;
-            console.log('Replaced!');
-         });
-      } catch (err) {
-         console.log("can't delete id:" + req.params.id);
-      }
-      console.log( data );
-      res.end(JSON.stringify(data));
-   });
+app.put('/editData/:teamID',function(req, res){
+   MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("hwData");
+      var id = req.params.teamID;
+      var myquery = { teamID: id };
+      var myobj = { $set: { teamID: req.body.temp, temp: req.body.teamID } };
+      dbo.collection("temperature").updateOne(myquery, myobj, function(err, res) {
+         if (err) throw err;
+         console.log("1 document updated");
+         res.end("1 document updated");
+         db.close();
+       });
+    });
+})
+
+app.delete('/deleteData/:teamID', function (req, res) {
+   MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("hwData");
+      var id = req.params.teamID;
+      var myquery = { teamID: id };
+      dbo.collection("temperature").deleteOne(myquery, function(err, res) {
+         if (err) throw err;
+         console.log("1 document updated");
+         res.end("1 document updated");
+         db.close();
+       });
+    });
 })
 
 var server = app.listen(8080, function () {
