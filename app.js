@@ -31,7 +31,7 @@ app.post('/receiveData', function (req, res) {
        if (err) throw err;
        console.log(myobj);
        console.log("1 document inserted");
-       res.end("1 document inserted");
+       res.send("1 document inserted");
        db.close();
      });
    });
@@ -43,11 +43,10 @@ app.get('/showData', function (req, res) {
       var dbo = db.db("hwData");
       dbo.collection("temperature").find({}).toArray(function(err, result) {
         if (err) throw err;
-        res.end(JSON.stringify(result));
+        res.send(JSON.stringify(result));
         db.close();
       });
     });
-   
 })
 
 
@@ -60,7 +59,7 @@ app.post('/addData', function (req, res) {
         if (err) throw err;
         console.log(myobj);
         console.log("1 document inserted");
-        res.end("1 document inserted");
+        res.send("1 document inserted");
         db.close();
       });
     });
@@ -76,7 +75,7 @@ app.put('/editData/:teamID',function(req, res){
       dbo.collection("temperature").updateOne(myquery, myobj, function(err, res) {
          if (err) throw err;
          console.log("1 document updated");
-         res.end("1 document updated");
+         res.send("1 document updated");
          db.close();
        });
     });
@@ -91,7 +90,7 @@ app.delete('/deleteData/:teamID', function (req, res) {
       dbo.collection("temperature").deleteOne(myquery, function(err, res) {
          if (err) throw err;
          console.log("1 document updated");
-         res.end("1 document updated");
+         res.send("1 document updated");
          db.close();
        });
     });
