@@ -15,6 +15,7 @@ app.use(bodyParser.json())
 
 // Push
 app.get('/webhook', (req, res) => {
+    res.send(1);
 	// push block
 	let msg = 'Hello World!'
 	push(msg)
@@ -23,6 +24,7 @@ app.get('/webhook', (req, res) => {
 
 // Reply
 app.post('/webhook', (req, res) => {
+    res.send(1);
   // reply block
   if (req.body.events[0].type == 'beacon') {
     let reply_token = req.body.events[0].replyToken
