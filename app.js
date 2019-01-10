@@ -197,13 +197,15 @@ app.get('/getSensor/:amount', function (req, res) {
         dbo.collection("SensorData").find({}).sort({Timestamp:-1}).limit(amount).toArray(function (err, result) {
             if (err) throw err;
             var sensor = {};
-            var temp = [],humi = [];
+            var temp = [],humi = [],total = [];
             Object.keys(result).forEach(function(key){
                 temp.push(result[key].Temperature);
                 humi.push(result[key].Humidity);
+                total.push( Math.abs( result[key]["P-IN"] - result[key]["P-OUT"] ));
             });
             sensor.temp = temp;
             sensor.humidity = humi;
+            sensor.total = total;
             res.send(JSON.stringify(sensor));
             db.close();
         });
