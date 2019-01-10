@@ -155,7 +155,7 @@ app.delete('/deleteData/:teamID', function (req, res) {
     });
 })
 
-var server = app.listen(8080, function () {
+var server = app.listen(80, function () {
    var port = server.address().port
    console.log("Example app listening at http://localhost:%s", port)
 })
