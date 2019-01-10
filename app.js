@@ -187,6 +187,30 @@ app.get('/getBeaconData/:hours', function (req, res) {
     });
 })
 
+app.get('/getSensor/:amount', function (req, res) {
+    MongoClient.connect(url, {
+        useNewUrlParser: true
+    }, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db("hwData");
+        var amount = parseInt(req.params.amount);
+        dbo.collection("SensorData").find({}).sort({Timestamp:-1}).limit(amount).toArray(function (err, result) {
+            if (err) throw err;
+            var sensor = {};
+            var temp = [],humi = [];
+            Object.keys(result).forEach(function(key){
+                temp.push(result[key].Temperature);
+                humi.push(result[key].Humidity);
+                console.log(date);
+            });
+            sensor.temp = temp;
+            sensor.humidity = humi;
+            res.send(JSON.stringify(result));
+            db.close();
+        });
+    });
+})
+
 app.post('/addData', function (req, res) {
     MongoClient.connect(url, {
         useNewUrlParser: true
