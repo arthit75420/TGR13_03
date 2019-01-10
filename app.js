@@ -8,8 +8,8 @@ const HEADERS = {
     'Authorization': 'Bearer Cb323ymn6q+7NbsTcoA0+6SZg06tEXwzhlIIShNZcM9HJPJYwSWLOu/9GiqdD6uLtnni5bpQXQikFBwFuOJUDysIbUNW+KlraTp6hT1kPSAYHBxaXugI55JHjc/UmqJoZxkFJnMR/paTw6l8kpE3lgdB04t89/1O/w1cDnyilFU='
 }
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://arthit75420:0825410282@localhost:27017/";
-
+//var url = "mongodb://arthit75420:0825410282@localhost:27017/";
+var url = "mongodb://localhost:27017/";
 function getMaxID(data) {
     var max = 0;
     Object.keys(data).forEach(function (key) {
@@ -75,6 +75,30 @@ app.get('/', function (req, res) {
 });
 app.use(bodyParser.json());
 
+app.post('/addSensorData', function (req, res) {
+    MongoClient.connect(url, {
+        useNewUrlParser: true
+    }, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db("hwData");
+        var data = req.body;
+        var myobj = {
+            Temperature: data.temp,
+            Humidity: data.humi,
+            "P-IN":data.pIN,
+            "P-OUT":data.pOUT,
+            Timestamp:data.Timestamp
+        };
+        dbo.collection("SensorData").insertOne(myobj, function (err, res1) {
+            if (err) throw err;
+            console.log(myobj);
+            console.log("1 document inserted");
+            res.send("1 document inserted");
+            db.close();
+        });
+    });
+})
+
 app.post('/receiveSensorData', function (req, res) {
     MongoClient.connect(url, {
         useNewUrlParser: true
@@ -126,12 +150,20 @@ app.get('/getSensorData/:hours', function (req, res) {
         useNewUrlParser: true
     }, function (err, db) {
         if (err) throw err;
-        var hours = req.params.hours;
+        var hours = parseInt(req.params.hours);
         var dbo = db.db("hwData");
         var date = new Date();
-        dbo.collection("SensorData").find({Timestamp:{$gte: date.toLocaleDateString() + " "+ hours +":00:00", $lt: date.toLocaleDateString() + " "+ hours +":59:59"}}).toArray(function (err, result) {
+        dbo.collection("SensorData").find({}).sort({Timestamp:-1}).limit(hours).toArray(function (err, result) {
             if (err) throw err;
-            res.send(JSON.stringify(result));
+            console.log(result);
+            var send = {};
+            var packets = [];
+            for (var i in result) {
+                packets.push( Math.abs( result[i]["P-IN"] - result[i]["P-OUT"]) );
+            }
+            send.number_of_tourist = packets;
+            if(hours > packets.length) send = {"status":"error"};
+            res.send(JSON.stringify(send));
             db.close();
         });
     });
@@ -145,6 +177,10 @@ app.get('/getBeaconData/:hours', function (req, res) {
         var dbo = db.db("hwData");
         dbo.collection("temperature").find({}).toArray(function (err, result) {
             if (err) throw err;
+            Object.keys(result).forEach(function(key){
+                var date = result[key].Timestamp.toLocaleDateString()
+                console.log(date);
+            });
             res.send(JSON.stringify(result));
             db.close();
         });
@@ -215,7 +251,7 @@ app.delete('/deleteData/:teamID', function (req, res) {
     });
 })
 
-var server = app.listen(80, function () {
+var server = app.listen(8080, function () {
     var port = server.address().port
     console.log("Example app listening at http://localhost:%s", port)
 })
