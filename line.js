@@ -15,7 +15,6 @@ app.use(bodyParser.json())
 
 // Push
 app.get('/webhook', (req, res) => {
-    res.send(1);
 	// push block
 	let msg = 'Hello World!'
 	push(msg)

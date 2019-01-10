@@ -20,7 +20,7 @@ app.get('/', function (req, res) {
 app.use(bodyParser.json());
 
 app.post('/receiveData', function (req, res) {
-   MongoClient.connect(url, function(err, db) {
+   MongoClient.connect(url,{ useNewUrlParser: true }, function(err, db) {
      if (err) throw err;
      var dbo = db.db("hwData");
      var data = req.body.DevEUI_uplink;
@@ -38,7 +38,7 @@ app.post('/receiveData', function (req, res) {
 })
 
 app.get('/showData', function (req, res) {
-   MongoClient.connect(url, function(err, db) {
+   MongoClient.connect(url,{ useNewUrlParser: true }, function(err, db) {
       if (err) throw err;
       var dbo = db.db("hwData");
       dbo.collection("temperature").find({}).toArray(function(err, result) {
@@ -51,7 +51,7 @@ app.get('/showData', function (req, res) {
 
 
 app.post('/addData', function (req, res) {
-   MongoClient.connect(url, function(err, db) {
+   MongoClient.connect(url,{ useNewUrlParser: true }, function(err, db) {
       if (err) throw err;
       var dbo = db.db("hwData");
       var myobj = { teamID: req.body.temp, temp: req.body.teamID };
@@ -66,7 +66,7 @@ app.post('/addData', function (req, res) {
 })
 
 app.put('/editData/:teamID',function(req, res){
-   MongoClient.connect(url, function(err, db) {
+   MongoClient.connect(url,{ useNewUrlParser: true }, function(err, db) {
       if (err) throw err;
       var dbo = db.db("hwData");
       var id = req.params.teamID;
@@ -82,7 +82,7 @@ app.put('/editData/:teamID',function(req, res){
 })
 
 app.delete('/deleteData/:teamID', function (req, res) {
-   MongoClient.connect(url, function(err, db) {
+   MongoClient.connect(url,{ useNewUrlParser: true }, function(err, db) {
       if (err) throw err;
       var dbo = db.db("hwData");
       var id = req.params.teamID;
