@@ -201,11 +201,10 @@ app.get('/getSensor/:amount', function (req, res) {
             Object.keys(result).forEach(function(key){
                 temp.push(result[key].Temperature);
                 humi.push(result[key].Humidity);
-                console.log(date);
             });
             sensor.temp = temp;
             sensor.humidity = humi;
-            res.send(JSON.stringify(result));
+            res.send(JSON.stringify(sensor));
             db.close();
         });
     });
