@@ -3,8 +3,7 @@ const request = require('request')
 const express = require('express')
 
 const app = express()
-const port = process.env.PORT || 4000
-const hostname = '127.0.0.1'
+const port = 8080
 const HEADERS = {
 	'Content-Type': 'application/json',
 	'Authorization': 'Bearer Cb323ymn6q+7NbsTcoA0+6SZg06tEXwzhlIIShNZcM9HJPJYwSWLOu/9GiqdD6uLtnni5bpQXQikFBwFuOJUDysIbUNW+KlraTp6hT1kPSAYHBxaXugI55JHjc/UmqJoZxkFJnMR/paTw6l8kpE3lgdB04t89/1O/w1cDnyilFU='
@@ -70,6 +69,6 @@ function curl(method, body) {
 	})
 }
 
-app.listen(port, hostname, () => {
-	console.log(`Server running at http://${hostname}:${port}/`)
+app.listen(port, function(){
+    console.log("server is run ...");
 })
