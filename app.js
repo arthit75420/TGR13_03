@@ -3,10 +3,7 @@ const request = require('request')
 var bodyParser = require("body-parser");
 var app = express();
 var fs = require("fs");
-const HEADERS = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer Cb323ymn6q+7NbsTcoA0+6SZg06tEXwzhlIIShNZcM9HJPJYwSWLOu/9GiqdD6uLtnni5bpQXQikFBwFuOJUDysIbUNW+KlraTp6hT1kPSAYHBxaXugI55JHjc/UmqJoZxkFJnMR/paTw6l8kpE3lgdB04t89/1O/w1cDnyilFU='
-}
+
 var MongoClient = require('mongodb').MongoClient;
 //var url = "mongodb://arthit75420:0825410282@localhost:27017/";
 var url = "mongodb://localhost:27017/";
@@ -18,57 +15,6 @@ function getMaxID(data) {
     return max;
 }
 
-//line
-app.get('/webhook', (req, res) => {
-    // push block
-    let msg = 'Hello World!'
-    push(msg)
-    res.send(msg)
-})
-// Reply
-app.post('/webhook', (req, res) => {
-    res.send(1);
-    // reply block
-    if (req.body.events[0].type == 'beacon') {
-        let reply_token = req.body.events[0].replyToken
-        let msg = JSON.stringify(req.body)
-        reply(reply_token, msg)
-    }
-})
-
-function push(msg) {
-    let body = JSON.stringify({
-        // push body
-        to: 'yyyyy',
-        messages: [{
-            type: 'text',
-            text: msg
-        }]
-    })
-    curl('push', body)
-}
-
-function reply(reply_token, msg) {
-    let body = JSON.stringify({
-        // reply body
-        replyToken: reply_token,
-        messages: [{
-            type: 'text',
-            text: msg
-        }]
-    })
-    curl('reply', body);
-}
-
-function curl(method, body) {
-    request.post({
-        url: 'https://api.line.me/v2/bot/message/' + method,
-        headers: HEADERS,
-        body: body
-    }, (err, res, body) => {
-        console.log('status = ' + res.statusCode)
-    })
-}
 //quiz
 app.get('/', function (req, res) {
     res.send("Sample Code for RESTful API");
@@ -114,7 +60,7 @@ app.post('/receiveSensorData', function (req, res) {
             "P-IN":frames[2].value,
             "P-OUT":frames[3].value
         };
-        dbo.collection("SensorData").insertOne(myobj, function (err, res) {
+        dbo.collection("SensorData").insertOne(myobj, function (err, res1) {
             if (err) throw err;
             console.log(myobj);
             console.log("1 document inserted");
@@ -135,7 +81,7 @@ app.post('/receiveBeaconData', function (req, res) {
             "P-IN":data.in,
             "P-OUT":data.out
         };
-        dbo.collection("BeaconData").insertOne(myobj, function (err, res) {
+        dbo.collection("BeaconData").insertOne(myobj, function (err, res1) {
             if (err) throw err;
             console.log(myobj);
             console.log("1 document inserted");
